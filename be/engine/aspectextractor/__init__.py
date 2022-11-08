@@ -23,4 +23,3 @@ class AspectExtractor:
     # TODO: read 'review' table, insert aspect data into 'aspect' table
 
     engine_db_conn.commit()
-    pass
