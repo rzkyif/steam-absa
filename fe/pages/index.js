@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import { useState } from 'react'
 
 const GAMES = ["Arma_3", "Counter_Strike_Global_Offensive", "Counter_Strike", "Dota_2", "Football_Manager_2015", "Garrys_Mod", "Grand_Theft_Auto_V", "Sid_Meiers_Civilization_5", "Team_Fortress_2", "The_Elder_Scrolls_V", "Warframe"]
 const GAME_LABEL = GAMES.map((x) => x.replace('_',' ').toUpperCase())
@@ -36,6 +37,13 @@ function ReviewData({game_id, username, review, review_url, sentiments}) {
 }
 
 export default function Main() {
+  const [filter, setFilter] = useState(Array(GAMES.length).fill(true))
+
+  function gameFilterChanged(e) {
+    let new_filter = filter
+    new_filter[e.target.value] = !e.target.checked
+    setFilter(new_filter)
+  }
 
   return (
     <div className="flex flex-col w-full h-screen">
@@ -58,11 +66,11 @@ export default function Main() {
             <span className='absolute right-0 flex items-center p-2 select-none'>🔍</span>
           </div>
           <span className='flex bg-yellow-200 w-full mt-3 px-3 pb-1 pt-2 text-xs'>GAME FILTER:</span>
-          <div className='flex flex-wrap bg-yellow-100 p-2'>
+          <div className='flex flex-wrap bg-yellow-100'>
             {GAMES.map((x, i) => (
-              <div className='bg-yellow-100 p-1'>
-                <input id={`game-${x}`} type='checkbox' name='game' value={i} checked/>
-                <label className='ml-2 mr-4' for={`game-${x}`}>{x.replaceAll('_',' ')}</label>
+              <div className='flex bg-yellow-100'>
+                <input className='ml-3 my-3' id={`game-${x}`} type='checkbox' name='game' value={i} onChange={gameFilterChanged}/>
+                <label className='pl-2 py-3 pr-4 select-none hover:underline' for={`game-${x}`}>{x.replaceAll('_',' ')}</label>
               </div>
             ))}
           </div>
