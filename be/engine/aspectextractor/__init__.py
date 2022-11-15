@@ -13,18 +13,18 @@ class AspectExtractor:
     """
 
     cur = engine_db_conn.cursor()
-    cur.execute("""
-      CREATE TABLE aspect (
-        review_id INTEGER,
-        aspect TEXT,
-        description TEXT,
-        FOREIGN KEY (review_id) 
-          REFERENCES review (rowid)
-            ON DELETE CASCADE
-            ON UPDATE NO ACTION
-      )
-    """)
-
+    # cur.execute("""
+    #   CREATE TABLE aspect (
+    #     review_id INTEGER,
+    #     aspect TEXT,
+    #     description TEXT,
+    #     FOREIGN KEY (review_id) 
+    #       REFERENCES review (rowid)
+    #         ON DELETE CASCADE
+    #         ON UPDATE NO ACTION
+    #   )
+    # """)
+    
     reviews = []
     for i in cur.execute("SELECT * FROM reviews"):
       sent = i[0].replace("\\\'", "'")
