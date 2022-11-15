@@ -6,7 +6,10 @@ const GAME_LABEL = GAMES.map((x) => x.replace('_',' ').toUpperCase())
 function ReviewData({game_id, username, review, review_url, sentiments}) {
   return (
     <div className='flex flex-col mb-3'>
-      <span className='flex bg-blue-200 w-full px-3 pb-1 pt-2 text-xs'>REVIEW &gt; {GAME_LABEL[game_id]}</span>
+      <div className='flex bg-blue-200 w-full'>
+        <span className='flex flex-1 px-3 pb-1 pt-2 text-xs'>REVIEW &gt; {GAME_LABEL[game_id]}</span>
+        <a className='flex px-3 pb-1 pt-2 text-xs underline' href={review_url} target="_blank">ORIGINAL LINK</a>
+      </div>
       <div className='flex bg-blue-100'>
         <div className='flex flex-col items-end w-72 p-3 border-r-[1px] border-black'>
           <span className='font-bold text-xl'>{username}</span>
@@ -48,7 +51,7 @@ export default function Main() {
         </span>
       </header>
       <main className='flex flex-col flex-1 relative bg-neutral-800 overflow-scroll'>
-        <div className='flex flex-col w-full sticky top-0 p-5 backdrop-brightness-[.3]'>
+        <div className='flex flex-col w-full sticky top-0 p-5 backdrop-brightness-[.3] md:px-[20vw]'>
           <span className='flex bg-yellow-200 w-full px-3 pb-1 pt-2 text-xs'>QUERY:</span>
           <div className='flex relative'>
             <input className='flex-1 py-2 px-3 font-bold bg-yellow-100 placeholder:text-yellow-800/40' type="text" placeholder='e.g. graphics'/>
@@ -64,7 +67,7 @@ export default function Main() {
             ))}
           </div>
         </div>
-        <div className='px-10 pb-2'>
+        <div className='px-10 pt-5 pb-2 md:px-[22%]'>
           <ReviewData 
             game_id={0}
             username="bobbyjenkins"
