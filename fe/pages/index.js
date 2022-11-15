@@ -17,12 +17,12 @@ function ReviewData({game_id, username, review, review_url, sentiments}) {
           <span className='mt-4 text-xs'>SENTIMENTS:</span>
           <div className='flex flex-wrap justify-end mt-1'>
             {sentiments.map(([aspect, sentiment]) => (
-              <div className={`p-2 rounded-2xl text-xs font-bold ml-2 ${sentiment == '+' ? 'bg-green-200' : 'bg-red-200'}`}>
+              <div className={`p-2 rounded-2xl text-xs ml-2 ${sentiment == '+' ? 'bg-green-200' : 'bg-red-200'}`}>
                 <span>
                   {sentiment}
                 </span>
                 <span className='ml-2'>
-                  {aspect}
+                  {aspect.toUpperCase()}
                 </span>
               </div>
             ))}
@@ -62,14 +62,14 @@ export default function Main() {
         <div className='flex flex-col w-full sticky top-0 p-5 backdrop-brightness-[.3] md:px-[20vw]'>
           <span className='flex bg-yellow-200 w-full px-3 pb-1 pt-2 text-xs'>QUERY:</span>
           <div className='flex relative'>
-            <input className='flex-1 py-2 px-3 font-bold bg-yellow-100 placeholder:text-yellow-800/40' type="text" placeholder='e.g. graphics'/>
+            <input className='flex-1 py-2 px-3 pr-10 font-bold bg-yellow-100 placeholder:text-yellow-800/40' type="text" placeholder='e.g. graphics'/>
             <span className='absolute right-0 flex items-center p-2 select-none'>🔍</span>
           </div>
           <span className='flex bg-yellow-200 w-full mt-3 px-3 pb-1 pt-2 text-xs'>GAME FILTER:</span>
           <div className='flex flex-wrap bg-yellow-100'>
             {GAMES.map((x, i) => (
               <div className='flex bg-yellow-100'>
-                <input className='ml-3 my-3' id={`game-${x}`} type='checkbox' name='game' value={i} onChange={gameFilterChanged}/>
+                <input className='ml-3 my-3' id={`game-${x}`} type='checkbox' name='game' value={i} defaultChecked onChange={gameFilterChanged}/>
                 <label className='pl-2 py-3 pr-4 select-none hover:underline' for={`game-${x}`}>{x.replaceAll('_',' ')}</label>
               </div>
             ))}
