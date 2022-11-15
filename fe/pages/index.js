@@ -38,11 +38,16 @@ function ReviewData({game_id, username, review, review_url, sentiments}) {
 
 export default function Main() {
   const [filter, setFilter] = useState(Array(GAMES.length).fill(true))
+  const [filterVisible, setFilterVisible] = useState(false)
 
   function gameFilterChanged(e) {
     let new_filter = filter
     new_filter[e.target.value] = !e.target.checked
     setFilter(new_filter)
+  }
+
+  function gameFilterVisibleChanged() {
+    setFilterVisible(!filterVisible)
   }
 
   return (
@@ -60,13 +65,16 @@ export default function Main() {
       </header>
       <main className='flex flex-col flex-1 relative bg-neutral-800 overflow-scroll'>
         <div className='flex flex-col w-full sticky top-0 p-5 backdrop-brightness-[.3] md:px-[20vw]'>
-          <span className='flex bg-yellow-200 w-full px-3 pb-1 pt-2 text-xs'>QUERY:</span>
+          <span className='flex bg-yellow-200 w-full px-3 pb-1 pt-2 text-xs'>QUERY</span>
           <div className='flex relative'>
             <input className='flex-1 py-2 px-3 pr-10 font-bold bg-yellow-100 placeholder:text-yellow-800/40' type="text" placeholder='e.g. graphics'/>
             <span className='absolute right-0 flex items-center p-2 select-none'>🔍</span>
           </div>
-          <span className='flex bg-yellow-200 w-full mt-3 px-3 pb-1 pt-2 text-xs'>GAME FILTER:</span>
-          <div className='flex flex-wrap bg-yellow-100'>
+          <div className='flex bg-yellow-200 w-full mt-3'>
+            <span className='flex flex-1 px-3 pb-1 pt-2 text-xs'>GAME FILTER</span>
+            <a className='flex px-3 pb-1 pt-2 text-xs underline cursor-pointer' onClick={gameFilterVisibleChanged}>{filterVisible ? 'HIDE' : 'SHOW'}</a>
+          </div>
+          <div className={`flex flex-wrap bg-yellow-100 transition-[max-height] overflow-clip ${filterVisible ? 'max-h-screen' : 'max-h-0'}`}>
             {GAMES.map((x, i) => (
               <div className='flex bg-yellow-100'>
                 <input className='ml-3 my-3' id={`game-${x}`} type='checkbox' name='game' value={i} defaultChecked onChange={gameFilterChanged}/>
