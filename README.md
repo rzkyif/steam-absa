@@ -33,11 +33,15 @@ A web application for information retrieval, aspect extraction, and aspect-based
 
         pip install hug waitress nltk spacy pandas numpy
 
-5. (Optional) Set Visual Studio Code interpreter for development
+5. Install spaCy model 
+
+        python -m spacy download en_core_web_sm
+
+6. (Optional) Set Visual Studio Code interpreter for development
 
     In the editor, when opening a Python file, set the interpreter to the virtual environment one by clicking the Python version number on the bottom right, selecting `Enter interpreter path...` and locating the Python interpreter at `./be/.venv/bin/python3`.
 
-6. Start backend server
+7. Start backend server
 
     Development w/ Hot Reload:
 
