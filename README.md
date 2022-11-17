@@ -31,7 +31,7 @@ A web application for information retrieval, aspect extraction, and aspect-based
 
 4. Install requirements
 
-        pip install hug waitress nltk spacy
+        pip install hug waitress nltk spacy pandas numpy
 
 5. (Optional) Set Visual Studio Code interpreter for development
 

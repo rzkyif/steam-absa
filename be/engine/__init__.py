@@ -18,10 +18,12 @@ class Engine:
     Args:
         data_db_path (str): path to review data SQLite database
     """
+    print('Preparing engine database...')
     engine_db_conn = sqlite3.connect(self.engine_db_path)
 
     # copy relevant review data from review data SQLite database to engine database
     if not utilities.table_exists(engine_db_conn, 'review'):
+      print(f"  Loading data from {data_db_path}...")
       engine_db_conn.execute("""
         CREATE TABLE game (
           name TEXT
@@ -40,9 +42,12 @@ class Engine:
         )
       """)
       engine_db_conn.execute('ATTACH DATABASE ? AS data', [data_db_path])
-      engine_db_conn.execute('INSERT INTO game SELECT rowid, name FROM data.game')
+      engine_db_conn.execute('INSERT INTO game(rowid, name) SELECT rowid, name FROM data.game')
       engine_db_conn.execute('INSERT INTO review SELECT game_id, username, review, review_url FROM data.review')
       engine_db_conn.commit()
+      print("    Done!")
+    else:
+      print("  Existing engine database found!")
 
     return engine_db_conn
 
@@ -71,6 +76,7 @@ class Engine:
     """
     return self.information_retriever.retrieve(self.engine_db, query)
 
+
   def __init__(self, data_db_path, engine_db_path=DEFAULT_ENGINE_DB_PATH):
     """Start up a new engine.
 
@@ -86,5 +92,5 @@ class Engine:
 
     # variables
     self.engine_db_path = engine_db_path
-    self.engine_db = self.initialize_engine_db(data_db_path)
+    self.engine_db_conn = self.initialize_engine_db(data_db_path)
     self.prepared = False

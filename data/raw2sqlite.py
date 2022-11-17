@@ -16,7 +16,7 @@ if os.path.exists(DB_PATH):
         sys.exit('Database already exists.')
 con = sqlite3.connect(DB_PATH)
 cur = con.cursor()
-cur.execute(f"CREATE TABLE reviews(game_id, {', '.join(COLUMNS)})")
+cur.execute(f"CREATE TABLE review(game_id, {', '.join(COLUMNS)})")
 cur.execute(f"CREATE TABLE game(name)")
 
 # open all review data, load into sqlite3 database
@@ -29,6 +29,6 @@ for id, game in enumerate(games):
         cur.execute(f"INSERT INTO game(rowid, name) VALUES (?, ?)", [id, game.replace('_', ' ')])
         for line in f:
             object = json.loads(line)
-            cur.execute(f"INSERT INTO reviews VALUES (?, ?, ?, ?)", [id] + [object[x] for x in COLUMNS])
+            cur.execute(f"INSERT INTO review VALUES (?, ?, ?, ?)", [id] + [object[x] for x in COLUMNS])
 con.commit()
 print(f"Completed!")
