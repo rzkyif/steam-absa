@@ -1,9 +1,9 @@
+import utilities
+import sqlite3
+
 from .informationretriever import InformationRetriever
 from .aspectextractor import AspectExtractor
 from .sentimentanalyzer import SentimentAnalyzer
-
-import utilities
-import sqlite3
 
 DEFAULT_ENGINE_DB_PATH = './engine.sqlite3'
 
