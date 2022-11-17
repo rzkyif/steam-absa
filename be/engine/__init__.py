@@ -1,6 +1,6 @@
-from informationretriever import InformationRetriever
-from aspectextractor import AspectExtractor
-from sentimentanalyzer import SentimentAnalyzer
+from .informationretriever import InformationRetriever
+from .aspectextractor import AspectExtractor
+from .sentimentanalyzer import SentimentAnalyzer
 
 import utilities
 import sqlite3
@@ -39,7 +39,7 @@ class Engine:
               ON UPDATE NO ACTION
         )
       """)
-      engine_db_conn.execute('ATTACH DATABASE ? AS data', data_db_path)
+      engine_db_conn.execute('ATTACH DATABASE ? AS data', [data_db_path])
       engine_db_conn.execute('INSERT INTO game SELECT rowid, name FROM data.game')
       engine_db_conn.execute('INSERT INTO review SELECT game_id, username, review, review_url FROM data.review')
       engine_db_conn.commit()

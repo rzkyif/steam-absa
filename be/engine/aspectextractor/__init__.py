@@ -59,7 +59,8 @@ class AspectExtractor:
 
     engine_db_conn.commit()
 
-ass = AspectExtractor()
-con = sqlite3.connect("data/reviews.db")
-cur = con.cursor()
-ass.generate_aspect_data(con)
+if __name__ == "__main__":
+  ass = AspectExtractor()
+  con = sqlite3.connect("data/reviews.db")
+  cur = con.cursor()
+  ass.generate_aspect_data(con)

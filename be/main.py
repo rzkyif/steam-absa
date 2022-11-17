@@ -2,7 +2,7 @@ import hug
 import json
 from engine import Engine
 
-engine = Engine('./data/data.sqlite3')
+engine = Engine('../data/data.sqlite3')
 
 @hug.get('/api/query')
 def query(q: hug.types.cut_off(255), cors: hug.directives.cors = '*'):      
