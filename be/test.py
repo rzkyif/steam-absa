@@ -12,7 +12,7 @@ def test_sentiment_analyzer(engine):
       engine (Engine): the test engine
   """
   engine.aspect_extractor.generate_aspect_data(engine.engine_db_conn)
-  engine.sentiment_analyzer.generate_sentiment_data(engine.engine_db_conn, False)
+  engine.sentiment_analyzer.generate_sentiment_data(engine.engine_db_conn, True)
 
 
 def test_aspect_extractor(engine):
@@ -21,7 +21,7 @@ def test_aspect_extractor(engine):
   Args:
       engine (Engine): the test engine
   """
-  engine.aspect_extractor.generate_aspect_data(engine.engine_db_conn)
+  engine.aspect_extractor.generate_aspect_data(engine.engine_db_conn, True)
 
 
 def test_information_retriever(engine):

@@ -41,7 +41,11 @@ A web application for information retrieval, aspect extraction, and aspect-based
 
     In the editor, when opening a Python file, set the interpreter to the virtual environment one by clicking the Python version number on the bottom right, selecting `Enter interpreter path...` and locating the Python interpreter at `./be/.venv/bin/python3`.
 
-7. Start backend server
+7. Prepare engine database
+
+        python main.py prepare
+
+8. Start backend server
 
     Development w/ Hot Reload:
 

@@ -16,13 +16,11 @@ class SentimentAnalyzer:
 
     print("Generating sentiment data...")
 
-    if utilities.table_exists(engine_db_conn, 'sentiment'):
-      if remake:
-        engine_db_conn.execute("DROP TABLE sentiment")
-      else:
-        print("  Found existing sentiment data!")
-        return
+    if utilities.table_exists(engine_db_conn, 'sentiment') and not remake:
+      print("  Found existing sentiment data!")
+      return
 
+    engine_db_conn.execute("DROP TABLE sentiment")
     engine_db_conn.execute("""
       CREATE TABLE sentiment (
         review_id INTEGER,
@@ -40,10 +38,11 @@ class SentimentAnalyzer:
     """)
 
     print("  Checking amod data...")
-    if utilities.table_exists(engine_db_conn, 'sentiment_amod'):
+    if utilities.table_exists(engine_db_conn, 'sentiment_amod') and not remake:
       print("    Found existing amod data!")
     else:
       print("    Building new amod data...")
+      engine_db_conn.execute("DROP TABLE sentiment_amod")
       engine_db_conn.execute("""
         CREATE TABLE sentiment_amod (
           review_id INTEGER,
@@ -66,17 +65,19 @@ class SentimentAnalyzer:
       review_count = cur.fetchone()[0]
       for review_data in cur.execute("SELECT rowid, review FROM review"):
         now = time.perf_counter()
-        if (now - last_print > 1):
+        if (now - last_print > 1) or (i == review_count-1):
           spent_time = now - start_time
-          print(f"\r    Progress: {i+1}/{review_count} ({spent_time:.2f}s, ETA: {(review_count-(i+1))*(spent_time/(i+1)):.2f}s)", end="")
+          print(f"\r      Progress: {i+1}/{review_count} ({spent_time:.2f}s, ETA: {(review_count-(i+1))*(spent_time/(i+1)):.2f}s)", end="")
           last_print = now
         [rowid, review] = review_data
         doc = nlp(review)
         for token in doc:
           if token.dep_ != 'amod': continue
+          print(f"      Found amod: {rowid} {token.text} {token.head.text}")
           cur2.execute("INSERT INTO sentiment_amod VALUES (?, ?, ?)", [rowid, token.text, token.head.text])
         i += 1
       engine_db_conn.commit()
+      print()
   
     # TODO: read 'review' table and 'aspect' table, populate 'sentiment' table with sentiment data
 

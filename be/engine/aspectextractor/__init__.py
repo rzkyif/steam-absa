@@ -50,7 +50,7 @@ class AspectExtractor:
     last_print = start_time - 10
     for i, sentence in enumerate(reviews):
       now = time.perf_counter()
-      if (now - last_print > 1):
+      if (now - last_print > 1) or (i == review_count-1):
         spent_time = now - start_time
         print(f"\r    Progress: {i+1}/{review_count} ({spent_time:.2f}s, ETA: {(review_count-(i+1))*(spent_time/(i+1)):.2f}s)", end="")
         last_print = now

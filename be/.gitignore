@@ -130,4 +130,4 @@ dmypy.json
 
 # Additional gitignores
 /.test
-/*.sqlite3
+/engine_test.sqlite3
