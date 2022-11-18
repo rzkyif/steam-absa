@@ -1,4 +1,4 @@
-import spacy, time
+import spacy, time, nltk
 
 from engine import utilities
 
@@ -54,27 +54,34 @@ class AspectExtractor:
         spent_time = now - start_time
         print(f"\r    Progress: {i+1}/{review_count} ({spent_time:.2f}s, ETA: {(review_count-(i+1))*(spent_time/(i+1)):.2f}s)", end="")
         last_print = now
-      doc = nlp(sentence)
-      descriptive_term = ''
-      target = ''
-      for token in doc:
-        if token.dep_ == 'nsubj' and token.pos_ == 'NOUN':
-          target = token.text
-        if token.pos_ == 'ADJ':
-          prepend = ''
-          for child in token.children:
-            if child.pos_ != 'ADV':
-              continue
-            prepend += child.text + ' '
-          descriptive_term = prepend + token.text
-      aspects.append({'aspect': target,
-        'description': descriptive_term})
-    print()
+      
+      cur_sentences = nltk.sent_tokenize(sentence)
+      cur_aspects = []
+      
+      for j in cur_sentences:
+        doc = nlp(j)
+        descriptive_term = ''
+        target = ''
+        for token in doc:
+          if token.dep_ == 'nsubj' and token.pos_ == 'NOUN':
+            target = token.text
+          if token.pos_ == 'ADJ':
+            prepend = ''
+            for child in token.children:
+              if child.pos_ != 'ADV':
+                continue
+              prepend += child.text + ' '
+            descriptive_term = prepend + token.text
+        if target and descriptive_term:
+          cur_aspects.append({'aspect': target, 'description': descriptive_term})
+      aspects.append({'id': i, 'aspects':cur_aspects})
 
     print("  Inserting aspect data to aspect table...")
     for i in range(len(aspects)):
-      a = aspects[i]['aspect'].replace("'","''")
-      d = aspects[i]['description'].replace("'","''")
-      cur.execute(f"INSERT INTO aspect VALUES ({i}, '{a}', '{d}')")
+      for j in aspects[i]['aspects']:
+        id = aspects[i]['id']
+        a = j['aspect'].replace("'","''")
+        d = j['description'].replace("'","''")
+        cur.execute(f"INSERT INTO aspect VALUES ({id}, '{a}', '{d}')")
 
     engine_db_conn.commit()
