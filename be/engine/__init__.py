@@ -33,8 +33,8 @@ class Engine:
         CREATE TABLE review (
           game_id INTEGER,
           username TEXT,
-          review_url TEXT,
           review TEXT,
+          review_url TEXT,
           FOREIGN KEY (game_id) 
             REFERENCES game (rowid)
               ON DELETE CASCADE
@@ -43,7 +43,7 @@ class Engine:
       """)
       engine_db_conn.execute('ATTACH DATABASE ? AS data', [data_db_path])
       engine_db_conn.execute('INSERT INTO game(rowid, name) SELECT rowid, name FROM data.game')
-      engine_db_conn.execute('INSERT INTO review SELECT game_id, username, review, review_url FROM data.review')
+      engine_db_conn.execute('INSERT INTO review(game_id, username, review, review_url) SELECT game_id, username, review, review_url FROM data.review')
       engine_db_conn.commit()
       print("    Done!")
     else:
