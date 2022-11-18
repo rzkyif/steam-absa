@@ -1,3 +1,7 @@
+import sqlite3, numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from numpy.linalg import norm
+
 class InformationRetriever:
   """A class that will retrieve review data that corresponds to queries
   """
@@ -13,6 +17,39 @@ class InformationRetriever:
         List[object]: list of review data that corresponds to query
     """    
     
-    # TODO: use engine database connection and information retrieval to get reviews that corresponds to query
+    datas = []
+    comments = []
+    cur = engine_db_conn.cursor()
+    for row in cur.execute("SELECT * from review"):
+      data = (row[0], row[1], row[2])
+      comment = row[3].replace("\\\'", "'")
+      datas.append(data)
+      comments.append(comment)
 
-    return []
+
+    vec = TfidfVectorizer()
+    document_vec = vec.fit_transform(comments)
+    query_vec = vec.transform([query])
+    query_array = np.array(query_vec.toarray()[0])
+
+    sims = []
+    for dv in document_vec:
+      document_array = np.array(dv.toarray())
+      sim = np.dot(document_array, query_array) / (norm(document_array) * norm(query_array)) if (norm(document_array) * norm(query_array)) != 0 else 0.0
+      sims.append(float(sim))
+    
+    # Tuple reviews: (game_id, username, review_url, review, cosine_similarity)
+    reviews = []
+    for i in range(len(datas)):
+      reviews.append((datas[i][0], datas[i][1], datas[i][2], comments[i], sims[i]))
+
+    reviews.sort(key=lambda tup: tup[4], reverse=True)
+    for i in range(5):
+      print(reviews[i])
+
+    return reviews
+
+if __name__=='__main__':
+  ir = InformationRetriever()
+  con = sqlite3.connect('../../../data/data.sqlite3')
+  ir.retrieve(con, "gta")
