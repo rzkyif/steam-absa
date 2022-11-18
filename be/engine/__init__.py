@@ -52,15 +52,15 @@ class Engine:
     return engine_db_conn
 
 
-  def prepare_engine_db(self):
+  def prepare_engine_db(self, remake=False):
     """Generate aspect data and sentiment data using aspect extractor and aspect based sentiment analyzer
     """
 
     # generate aspect data
-    self.aspect_extractor.generate_aspect_data()
+    self.aspect_extractor.generate_aspect_data(self.engine_db_conn, remake)
 
     # generate sentiment data
-    self.sentiment_analyzer.generate_sentiment_data()
+    self.sentiment_analyzer.generate_sentiment_data(self.engine_db_conn, remake)
 
     self.prepared = True
 

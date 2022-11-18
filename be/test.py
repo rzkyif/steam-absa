@@ -1,4 +1,4 @@
-import argparse, shutil, os, sqlite3
+import argparse, os
 
 from engine import Engine
 
@@ -11,8 +11,8 @@ def test_sentiment_analyzer(engine):
   Args:
       engine (Engine): the test engine
   """
-  # engine.aspect_extractor.generate_aspect_data(engine.engine_db_conn)
-  engine.sentiment_analyzer.generate_sentiment_data(engine.engine_db_conn)
+  engine.aspect_extractor.generate_aspect_data(engine.engine_db_conn)
+  engine.sentiment_analyzer.generate_sentiment_data(engine.engine_db_conn, False)
 
 
 def test_aspect_extractor(engine):
@@ -41,8 +41,15 @@ if __name__ == "__main__":
     choices=SUPPORTED_COMPONENTS, 
     help=f'Which component to test. Options: {", ".join(SUPPORTED_COMPONENTS)}'
   )
+  parser.add_argument(
+    '-c', '--clean', metavar='clean', 
+    const=True, default=False, action='store_const', 
+    help=f'Start with a clean database.'
+  )
   args = parser.parse_args()
 
+  if args.clean and os.path.exists("./engine_test.sqlite3"):
+    os.remove('./engine_test.sqlite3')
   engine = Engine('../data/data.sqlite3', engine_db_path='./engine_test.sqlite3')
 
   if args.component == 'sentimentanalyzer':
