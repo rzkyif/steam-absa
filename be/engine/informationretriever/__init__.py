@@ -21,7 +21,7 @@ class InformationRetriever:
     cur = engine_db_conn.cursor()
     row_ids = []
     review_texts = []
-    for row in cur.execute("SELECT game_id, rowid, review from review"):
+    for row in cur.execute("SELECT game_id, review.rowid, review FROM sentiment LEFT JOIN aspect LEFT JOIN review WHERE sentiment.aspect_id = aspect.rowid AND aspect.review_id = review.rowid"):
       if game_filter is not None and row[0] not in game_filter: continue
       row_ids.append(row[1])
       review_texts.append(row[2].replace("\\\'", "'"))
