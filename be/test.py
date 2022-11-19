@@ -31,7 +31,7 @@ def test_information_retriever(engine):
       engine (Engine): the test engine
   """
   engine.prepare_engine_db()
-  engine.query('graphics')
+  print(engine.query('gta'))
 
 
 if __name__ == "__main__":
