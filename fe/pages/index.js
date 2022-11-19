@@ -45,7 +45,7 @@ export default function Main() {
 
   function gameFilterChanged(e) {
     let new_filter = filter
-    new_filter[e.target.value] = !e.target.checked
+    new_filter[e.target.value] = e.target.checked
     setFilter(new_filter)
   }
 
