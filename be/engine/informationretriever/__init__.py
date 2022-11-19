@@ -1,4 +1,4 @@
-import sqlite3, numpy as np, nltk
+import sqlite3, numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from numpy.linalg import norm
 
@@ -19,7 +19,6 @@ class InformationRetriever:
     
     datas = []
     comments = []
-    stopwords = nltk.corpus.stopwords.words('english')
     cur = engine_db_conn.cursor()
     for row in cur.execute("SELECT * from review"):
       comment = row[3].replace("\\\'", "'")
@@ -45,8 +44,8 @@ class InformationRetriever:
 
     reviews.sort(key=lambda tup: tup[4], reverse=True)
     
-    # for i in range(5):
-    #   print(reviews[i])
+    for i in range(5):
+      print(reviews[i])
 
     return reviews
 
