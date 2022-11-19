@@ -20,7 +20,7 @@ class SentimentAnalyzer:
       print("  Found existing sentiment data!")
       return
 
-    engine_db_conn.execute("DROP TABLE sentiment")
+    engine_db_conn.execute("DROP TABLE IF EXISTS sentiment")
     engine_db_conn.execute("""
       CREATE TABLE sentiment (
         review_id INTEGER,
@@ -42,7 +42,7 @@ class SentimentAnalyzer:
       print("    Found existing amod data!")
     else:
       print("    Building new amod data...")
-      engine_db_conn.execute("DROP TABLE sentiment_amod")
+      engine_db_conn.execute("DROP TABLE IF EXISTS sentiment_amod")
       engine_db_conn.execute("""
         CREATE TABLE sentiment_amod (
           review_id INTEGER,
