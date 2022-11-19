@@ -1,6 +1,9 @@
 import spacy, time
 
 from engine import utilities
+from transformers import pipeline
+
+sentiment_pipeline = pipeline("sentiment-analysis", top_k=None, model="cardiffnlp/twitter-roberta-base-sentiment-latest")
 
 class SentimentAnalyzer:
   """An class that will generate sentiment data from review data and aspect data.
@@ -23,13 +26,8 @@ class SentimentAnalyzer:
     engine_db_conn.execute("DROP TABLE IF EXISTS sentiment")
     engine_db_conn.execute("""
       CREATE TABLE sentiment (
-        review_id INTEGER,
-        aspect_id INTEGER
+        aspect_id INTEGER,
         sentiment TEXT,
-        FOREIGN KEY (review_id) 
-          REFERENCES review (rowid) 
-            ON DELETE CASCADE
-            ON UPDATE NO ACTION,
         FOREIGN KEY (aspect_id) 
           REFERENCES aspect (rowid)
             ON DELETE CASCADE
@@ -37,48 +35,31 @@ class SentimentAnalyzer:
       )
     """)
 
-    print("  Checking amod data...")
-    if utilities.table_exists(engine_db_conn, 'sentiment_amod') and not remake:
-      print("    Found existing amod data!")
-    else:
-      print("    Building new amod data...")
-      engine_db_conn.execute("DROP TABLE IF EXISTS sentiment_amod")
-      engine_db_conn.execute("""
-        CREATE TABLE sentiment_amod (
-          review_id INTEGER,
-          adjective TEXT
-          object TEXT,
-          FOREIGN KEY (review_id) 
-            REFERENCES review (rowid) 
-              ON DELETE CASCADE
-              ON UPDATE NO ACTION
-        )
-      """)
-      engine_db_conn.commit()
-      nlp = spacy.load("en_core_web_sm")
-      cur = engine_db_conn.cursor()
-      cur2 = engine_db_conn.cursor()
-      i = 0
-      start_time = time.perf_counter()
-      last_print = start_time - 10
-      cur.execute("SELECT count(rowid) FROM review")
-      review_count = cur.fetchone()[0]
-      for review_data in cur.execute("SELECT rowid, review FROM review"):
-        now = time.perf_counter()
-        if (now - last_print > 1) or (i == review_count-1):
-          spent_time = now - start_time
-          print(f"\r      Progress: {i+1}/{review_count} ({spent_time:.2f}s, ETA: {(review_count-(i+1))*(spent_time/(i+1)):.2f}s)", end="")
-          last_print = now
-        [rowid, review] = review_data
-        doc = nlp(review)
-        for token in doc:
-          if token.dep_ != 'amod': continue
-          print(f"      Found amod: {rowid} {token.text} {token.head.text}")
-          cur2.execute("INSERT INTO sentiment_amod VALUES (?, ?, ?)", [rowid, token.text, token.head.text])
-        i += 1
-      engine_db_conn.commit()
-      print()
-  
-    # TODO: read 'review' table and 'aspect' table, populate 'sentiment' table with sentiment data
+    print("    Turning aspect data to sentiment data...")
+    nlp = spacy.load("en_core_web_sm")
+    cur = engine_db_conn.cursor()
+    cur2 = engine_db_conn.cursor()
+    i = 0
+    start_time = time.perf_counter()
+    last_print = start_time - 10
+    cur.execute("SELECT count(rowid) FROM aspect")
+    review_count = cur.fetchone()[0]
+    for aspect_data in cur.execute("SELECT rowid, description FROM aspect"):
+      now = time.perf_counter()
+      if (now - last_print > 1) or (i == review_count-1):
+        spent_time = now - start_time
+        print(f"\r      Progress: {i+1}/{review_count} ({spent_time:.2f}s, ETA: {(review_count-(i+1))*(spent_time/(i+1)):.2f}s)", end="")
+        last_print = now
 
+      aspect_id, description = aspect_data
+
+      negative, neutral, positive = sentiment_pipeline(description)[0]
+      if neutral['score'] < 0.3:
+        if positive['score'] > negative['score']:
+          cur2.execute("INSERT INTO sentiment VALUES (?, '+')", [aspect_id])
+        else:
+          cur2.execute("INSERT INTO sentiment VALUES (?, '-')", [aspect_id])
+
+      i += 1
     engine_db_conn.commit()
+    print()
