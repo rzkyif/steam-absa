@@ -6,8 +6,8 @@ SUPPORTED_COMMANDS = ['prepare', 'remake']
 engine = Engine('../data/data.sqlite3')
 
 @hug.get('/api/query')
-def query(q: hug.types.cut_off(255), cors: hug.directives.cors = '*'):      
-  result = engine.query(q)
+def query(q: hug.types.cut_off(255), count: hug.types.number=20, skip: hug.types.number=0, game_filter: hug.types.comma_separated_list=[], cors: hug.directives.cors = '*'):      
+  result = engine.query(q, count, skip, game_filter)
   return json.dumps(result)
 
 if __name__ == "__main__":

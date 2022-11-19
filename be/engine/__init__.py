@@ -65,7 +65,7 @@ class Engine:
     self.prepared = True
 
 
-  def query(self, query):
+  def query(self, query, count=20, skip=0, game_filter=None):
     """Return Steam review data for reviews that match the query.
 
     Args:
@@ -74,7 +74,10 @@ class Engine:
     Returns:
         List[object]: list of review data
     """
-    return self.information_retriever.retrieve(self.engine_db, query)
+    row_id_list = self.information_retriever.retrieve(self.engine_db_conn, query, count, skip, game_filter)
+    cur = self.engine_db_conn.cursor()
+    cur.execute(f"SELECT * FROM review WHERE rowid IN ({', '.join(['?' for _ in row_id_list])})", list(map(lambda x: x[0], row_id_list)))
+    return cur.fetchall()
 
 
   def __init__(self, data_db_path, engine_db_path=DEFAULT_ENGINE_DB_PATH):
