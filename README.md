@@ -33,7 +33,7 @@ A web application for information retrieval, aspect extraction, and aspect-based
 
         pip install wheel 
         
-        pip install hug waitress nltk transformers tensorflow==2.10 keras==2.10 scikit-learn spacy pandas numpy
+        pip install hug waitress nltk scikit-learn spacy pandas numpy textblob
 
         python -m spacy download en_core_web_sm
 

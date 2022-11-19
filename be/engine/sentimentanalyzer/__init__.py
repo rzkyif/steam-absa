@@ -1,9 +1,7 @@
-import spacy, time
+import time
 
+from textblob import TextBlob
 from engine import utilities
-from transformers import pipeline
-
-sentiment_pipeline = pipeline("sentiment-analysis", top_k=None, model="cardiffnlp/twitter-roberta-base-sentiment-latest")
 
 class SentimentAnalyzer:
   """An class that will generate sentiment data from review data and aspect data.
@@ -36,7 +34,6 @@ class SentimentAnalyzer:
     """)
 
     print("    Turning aspect data to sentiment data...")
-    nlp = spacy.load("en_core_web_sm")
     cur = engine_db_conn.cursor()
     cur2 = engine_db_conn.cursor()
     i = 0
@@ -53,12 +50,11 @@ class SentimentAnalyzer:
 
       aspect_id, description = aspect_data
 
-      negative, neutral, positive = sentiment_pipeline(description)[0]
-      if neutral['score'] < 0.3:
-        if positive['score'] > negative['score']:
-          cur2.execute("INSERT INTO sentiment VALUES (?, '+')", [aspect_id])
-        else:
-          cur2.execute("INSERT INTO sentiment VALUES (?, '-')", [aspect_id])
+      polarity = TextBlob(description).sentiment.polarity
+      if polarity > 0.5:
+        cur2.execute("INSERT INTO sentiment VALUES (?, '+')", [aspect_id])
+      elif polarity < -0.5:
+        cur2.execute("INSERT INTO sentiment VALUES (?, '-')", [aspect_id])
 
       i += 1
     engine_db_conn.commit()
