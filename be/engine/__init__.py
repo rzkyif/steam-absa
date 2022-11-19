@@ -74,10 +74,26 @@ class Engine:
     Returns:
         List[object]: list of review data
     """
-    row_id_list = self.information_retriever.retrieve(self.engine_db_conn, query, count, skip, game_filter)
+    review_id_list = self.information_retriever.retrieve(self.engine_db_conn, query, count, skip, game_filter)
     cur = self.engine_db_conn.cursor()
-    cur.execute(f"SELECT * FROM review WHERE rowid IN ({', '.join(['?' for _ in row_id_list])})", list(map(lambda x: x[0], row_id_list)))
-    return cur.fetchall()
+
+    results = []
+    for [review_id, _] in review_id_list:
+      cur.execute("SELECT game_id, username, review, review_url FROM review WHERE rowid = ?", [review_id])
+      [game_id, username, review, review_url] = cur.fetchone()
+      sentiments = []
+      cur.execute("SELECT aspect, sentiment FROM aspect, sentiment WHERE aspect.review_id = ? AND sentiment.aspect_id = aspect.rowid", [review_id])
+      for [aspect, sentiment] in cur.fetchall():
+        sentiments.append((aspect, sentiment))
+      results.append({
+        'game_id': game_id,
+        'username': username,
+        'review': review,
+        'review_url': review_url,
+        'sentiments': sentiments
+      })
+
+    return results
 
 
   def __init__(self, data_db_path, engine_db_path=DEFAULT_ENGINE_DB_PATH):

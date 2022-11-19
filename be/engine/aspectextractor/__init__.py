@@ -40,9 +40,8 @@ class AspectExtractor:
     
     print("  Reading review data...")
     reviews = []
-    for i in cur.execute("SELECT review FROM review"):
-      sent = i[0].replace("\\\'", "'")
-      reviews.append(sent)
+    for i in cur.execute("SELECT rowid, review FROM review"):
+      reviews.append((i[0], i[1].replace("\\\'", "'")))
 
     print("  Extracting aspect data from reviews...")
     aspects = []
@@ -50,7 +49,7 @@ class AspectExtractor:
     review_count = len(reviews)
     start_time = time.perf_counter()
     last_print = start_time - 10
-    for i, sentence in enumerate(reviews):
+    for i, [row_id, sentence] in enumerate(reviews):
       now = time.perf_counter()
       if (now - last_print > 1) or (i == review_count-1):
         spent_time = now - start_time
@@ -76,15 +75,14 @@ class AspectExtractor:
             descriptive_term = prepend + token.text
         if target and descriptive_term:
           cur_aspects.append({'aspect': target, 'description': descriptive_term})
-      aspects.append({'id': i, 'aspects':cur_aspects})
+      aspects.append({'id': row_id, 'aspects':cur_aspects})
     print()
 
     print("  Inserting aspect data to aspect table...")
     for i in range(len(aspects)):
-      for j in aspects[i]['aspects']:
-        id = aspects[i]['id']
-        a = j['aspect'].replace("'","''")
-        d = j['description'].replace("'","''")
-        cur.execute(f"INSERT INTO aspect VALUES ({id}, '{a}', '{d}')")
+      for aspect in aspects[i]['aspects']:
+        cur.execute(f"INSERT INTO aspect VALUES (?, ?, ?)", [
+          aspects[i]['id'], aspect['aspect'], aspect['description']
+        ])
 
     engine_db_conn.commit()
