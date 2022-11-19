@@ -1,4 +1,4 @@
-import sqlite3, numpy as np
+import sqlite3, numpy as np, nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
 from numpy.linalg import norm
 
@@ -19,13 +19,13 @@ class InformationRetriever:
     
     datas = []
     comments = []
+    stopwords = nltk.corpus.stopwords.words('english')
     cur = engine_db_conn.cursor()
     for row in cur.execute("SELECT * from review"):
-      data = (row[0], row[1], row[2])
       comment = row[3].replace("\\\'", "'")
+      data = (row[0], row[1], row[2], comment)
       datas.append(data)
       comments.append(comment)
-
 
     vec = TfidfVectorizer()
     document_vec = vec.fit_transform(comments)
@@ -41,11 +41,12 @@ class InformationRetriever:
     # Tuple reviews: (game_id, username, review_url, review, cosine_similarity)
     reviews = []
     for i in range(len(datas)):
-      reviews.append((datas[i][0], datas[i][1], datas[i][2], comments[i], sims[i]))
+      reviews.append((datas[i][0], datas[i][1], datas[i][2], datas[i][3], sims[i]))
 
     reviews.sort(key=lambda tup: tup[4], reverse=True)
-    for i in range(5):
-      print(reviews[i])
+    
+    # for i in range(5):
+    #   print(reviews[i])
 
     return reviews
 
