@@ -2,6 +2,8 @@ import spacy, time, nltk
 
 from engine import utilities
 
+nltk.download('punkt')
+
 class AspectExtractor:
   """An class that will generate aspect data from review data.
   """
@@ -75,6 +77,7 @@ class AspectExtractor:
         if target and descriptive_term:
           cur_aspects.append({'aspect': target, 'description': descriptive_term})
       aspects.append({'id': i, 'aspects':cur_aspects})
+    print()
 
     print("  Inserting aspect data to aspect table...")
     for i in range(len(aspects)):
